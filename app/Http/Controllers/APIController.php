@@ -118,4 +118,32 @@ class APIController extends Controller
             return response()->json([ "message"=>"Multiple User Created Successfully" ],201);
         }        
     }
-}
+
+    public function UpdateUserDetails(Request $request,$id=null){
+        if ($request->isMethod('put')) {
+            $userData = $request->input();
+            User::where('id',$id)->update([
+                "name"=>$userData['name'],
+                "email"=>$userData['email'],
+                "password"=>$userData['password'],
+            ]);
+            return response()->json([ "message"=>"user information updated successfully" ],202);
+        }        
+    }
+
+    public function UpdateUserName(Request $request,$id){
+        if ($request->isMethod('patch')) {
+            $userData = $request->input();
+            User::where('id',$id)->update([
+                "name"=>$userData['name'],
+            ]);
+            return response()->json([ "message"=>"user name updated successfully" ],202);
+        }        
+    }
+
+    
+    public function DeleteUser($id){
+        User::where('id',$id)->delete();
+        return response()->json([ "message"=>"user deleted successfully" ],202);    
+    }
+} 
