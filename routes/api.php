@@ -23,3 +23,5 @@ Route::post('login-user',[APIController::class,'LoginUser']);
 Route::post('login-user-with-passport',[APIController::class,'LoginUserWithPassport']);
 Route::post('logout-user',[APIController::class,'LogoutUser']);
 
+Route::post('update-stock',[APIController::class,'UpdateStock']);
+Route::post('update-products-stock',[APIController::class,'UpdateProductsStock']);

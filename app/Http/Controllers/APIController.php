@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProductAttribute;
 use Validator;
 use App\Models\User;
 use Exception;
@@ -328,5 +329,100 @@ class APIController extends Controller
             }            
 
         }                
+    }
+
+    
+    public function UpdateStock(Request $request){
+        $header = $request->header('Authorization');
+        if (empty($header)) {
+            return response()->json([
+                "status"=>false, 
+                "message"=>"header authorization token is missing",
+            ],422);
+        }else {
+            if ($header=="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFidXphciBHaWZhcmkiLCJpYXQiOjE1MTYyMzkwMjJ9.r4vCuN7pdA0vC6YMUokA7C6742h8s_zn2SiXCggdeac") {
+                
+                // UPDATE STOCK API
+                if ($request->isMethod('post')) {
+                    $url="http://sitemakers.in/stocks.json";
+                    $curl=curl_init();
+                    curl_setopt($curl,CURLOPT_URL,$url);
+                    curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+                    curl_setopt($curl,CURLOPT_HEADER,false);
+                    $data = curl_exec($curl);
+                    curl_close($curl);
+                    $data = json_decode($data,true);
+
+                    if (isset($data['items'])) {
+                        
+                        foreach($data['items'] as $key=>$value)
+                        {
+                            ProductAttribute::where('sku',$value['sku'])
+                            ->update('stock',$value['stock']);
+                        }
+                        $message="Product Stock Updated Successfully";
+                        return response()->json([
+                            "status"=>false, 
+                            "message"=>"No Items Are Found!!",
+                        ],422);
+
+                    }else {
+                        return response()->json([
+                            "status"=>false, 
+                            "message"=>"Header Authorization Token is Incorrect",
+                        ],422); 
+                    }
+                }
+
+
+            }else {
+                return response()->json([
+                    "status"=>false, 
+                    "message"=>"Header Authorization Token is Incorrect",
+                ],422);             
+            }
+        }     
+    }
+    
+    public function UpdateProductsStock(Request $request){
+        $header = $request->header('Authorization');
+        if (empty($header)) {
+            return response()->json([
+                "status"=>false, 
+                "message"=>"header authorization token is missing",
+            ],422);
+        }else {
+            if ($header=="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFidXphciBHaWZhcmkiLCJpYXQiOjE1MTYyMzkwMjJ9.r4vCuN7pdA0vC6YMUokA7C6742h8s_zn2SiXCggdeac") {
+                
+                // UPDATE STOCK API
+                if ($request->isMethod('post')) {
+                    $data = $request->all();
+                    // echo "<pre>";print_r($data);die;
+                    if (isset($data['items'])) {
+                        foreach($data['items'] as $key=>$value)
+                        {
+                            ProductAttribute::where('sku',$value['sku'])->update([
+                                'stock'=>$value['stock']
+                            ]);
+                        }
+                        $message="Products Stock Updated Successfully";
+                        return response()->json([
+                            "status"=>true, 
+                            "message"=>$message
+                        ],200);   
+                    }else {
+                        return response()->json([
+                            "status"=>false, 
+                            "message"=>"No Items Are Found!!",
+                        ],422);
+                    }
+                }
+            }else {
+                return response()->json([
+                    "status"=>false,
+                    "message"=>"Header Authorization Token is Incorrect",
+                ],422);             
+            }
+        }     
     }
 } 
