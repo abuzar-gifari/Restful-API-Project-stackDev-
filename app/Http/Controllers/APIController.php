@@ -283,4 +283,50 @@ class APIController extends Controller
             }              
         }        
     }
+
+    public function LoginUserWithPassport(Request $request){
+        if ($request->isMethod('post')) {
+            $userData = $request->input();
+            // $apiToken = Str::random(60);
+
+            // ADVANCE VALIDATION PROCESS   
+            $rules=[
+                "email"=>"required|email|exists:users",
+                "password"=>"required",
+            ];
+
+            $customMessages=[
+                "email.required"=>"your email is required",
+                "email.email"=>"your email is not valid",
+                "email.exists"=>"email already exists",
+                "password.required"=>"password is required",
+            ];
+
+            $validator = FacadesValidator::make($userData,$rules,$customMessages);
+
+            if ($validator->fails()) {
+                return response()->json([ "success"=>false,"message"=>$validator->errors() ],422);    
+            }
+
+
+            if ( Auth::attempt( [ "email"=>$userData['email'],"password"=>$userData['password'] ] ) ) {
+                $user = User::where('email',$userData['email'])->first();                
+                // $accessToken = $user->createToken($userData['email'])->createToken;   
+                $accessToken = $user->createToken($userData['email'])->accessToken;
+                // echo "<pre>";print_r(Auth::user());die; 
+                User::where('email',$userData['email'])->update(['access_token'=>$accessToken]);
+                return response()->json([
+                    "status"=>true, 
+                    "message"=>"User Login Successfully via passport",
+                    "token"=>$accessToken 
+                ],201);
+            }else {
+                return response()->json([
+                    "status"=>false, 
+                    "message"=>"Login Failed",
+                ],422);
+            }            
+
+        }                
+    }
 } 
