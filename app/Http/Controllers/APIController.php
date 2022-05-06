@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use Validator;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
+// use Auth;
 
 class APIController extends Controller
 {
+    
     public function getUsers($id=null){
         if (empty($id)) {
             $getUsers=User::all();
@@ -174,7 +178,7 @@ class APIController extends Controller
             $user->name = $userData['name'];
             $user->email = $userData['email'];
             $user->password = bcrypt($userData['password']);
-            $user->api_token = $apiToken;
+            $user->access_token = $apiToken;
             $user->save();
             return response()->json([
                 "status"=>true, 
@@ -183,6 +187,50 @@ class APIController extends Controller
             ],201);
         }
     }
+
+
+    public function RegisterUserWithPassport(Request $request){
+
+        try {
+            if ($request->isMethod('post')) {
+                $userData = $request->input();
+    
+                // $apiToken = Str::random(60);
+    
+                $user = new User();
+                $user->name = $userData['name'];
+                $user->email = $userData['email'];
+                $user->password = bcrypt($userData['password']);
+                // $user->api_token = $apiToken;
+                $user->save();
+    
+                if ( Auth::attempt( [ "email"=>$userData['email'],"password"=>$userData['password'] ] ) ) {
+                    $user = User::where('email',$userData['email'])->first();                
+                    // $accessToken = $user->createToken($userData['email'])->createToken;   
+                    $accessToken = $user->createToken($userData['email'])->accessToken;
+                    // echo "<pre>";print_r(Auth::user());die; 
+                    User::where('email',$userData['email'])->update(['access_token'=>$accessToken]);
+                    return response()->json([
+                        "status"=>true, 
+                        "message"=>"user registered successfully via passport",
+                        "token"=>$accessToken 
+                    ],201);
+                }else {
+                    return response()->json([
+                        "status"=>false, 
+                        "message"=>"Something went wrong",
+                    ],422);
+                }
+            }    
+        } catch (Exception $e) {
+            return response()->json([
+                "status"=>false, 
+                "message"=>$e->getMessage(),
+            ],422);
+        }
+        
+    }
+
 
     public function LoginUser(Request $request){
         if ($request->isMethod('post')) {

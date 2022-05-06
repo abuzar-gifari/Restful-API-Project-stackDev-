@@ -18,5 +18,7 @@ Route::patch('/update-user-name/{id}',[APIController::class,'UpdateUserName']);
 Route::delete('/delete-user/{id}',[APIController::class,'DeleteUser']);
 
 Route::post('register-user',[APIController::class,'RegisterUser']);
+Route::post('register-user-with-passport',[APIController::class,'RegisterUserWithPassport']);
 Route::post('login-user',[APIController::class,'LoginUser']);
 Route::post('logout-user',[APIController::class,'LogoutUser']);
+
