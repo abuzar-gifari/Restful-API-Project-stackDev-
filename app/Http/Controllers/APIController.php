@@ -282,7 +282,7 @@ class APIController extends Controller
                 return response()->json([ "success"=>false,"message"=>$validator->errors() ],422);    
             }
 
-
+            /* CATCH LOGIN INFORMATION WITH GENERATE A AUTHORIZATION TOKEN */
             if ( Auth::attempt( [ "email"=>$userData['email'],"password"=>$userData['password'] ] ) ) {
                 $user = User::where('email',$userData['email'])->first();                
                 // $accessToken = $user->createToken($userData['email'])->createToken;   
