@@ -243,21 +243,6 @@ class APIController extends Controller
         }
     }
 
-    public function LogoutUser(Request $request){
-        $api_token=$request->header('Authorization');
-        if (empty($api_token)) {
-            $message="User token is missing in api header";
-            return response()->json([ "message"=>$message ],422);
-        }else {
-            $api_token = str_replace("Bearer ","",$api_token);
-            $userCount = User::where('api_token',$api_token)->count();
-            if ($userCount>0) {
-                User::where('api_token',$api_token)->update(['api_token'=>null]);
-                return response()->json([ "success"=>true,"message"=>"User Logout Successfully" ],200);
-            }              
-        }        
-    }
-
     public function LoginUserWithPassport(Request $request){
         if ($request->isMethod('post')) {
             $userData = $request->input();
@@ -305,6 +290,20 @@ class APIController extends Controller
         }                
     }
 
+    public function LogoutUser(Request $request){
+        $api_token=$request->header('Authorization');
+        if (empty($api_token)) {
+            $message="User token is missing in api header";
+            return response()->json([ "message"=>$message ],422);
+        }else {
+            $api_token = str_replace("Bearer ","",$api_token);
+            $userCount = User::where('api_token',$api_token)->count();
+            if ($userCount>0) {
+                User::where('api_token',$api_token)->update(['api_token'=>null]);
+                return response()->json([ "success"=>true,"message"=>"User Logout Successfully" ],200);
+            }              
+        }        
+    }
 
     public function UpdateStock(Request $request){
         $header = $request->header('Authorization');
