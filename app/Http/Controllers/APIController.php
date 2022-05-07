@@ -122,7 +122,6 @@ class APIController extends Controller
         }        
     }
 
-    
     public function DeleteUser($id){
         User::where('id',$id)->delete();
         return response()->json([ "message"=>"user deleted successfully" ],202);    
@@ -162,7 +161,6 @@ class APIController extends Controller
             ],201);
         }
     }
-
 
     public function RegisterUserWithPassport(Request $request){
 
@@ -204,7 +202,6 @@ class APIController extends Controller
             ],422);
         }
     }
-
 
     public function LoginUser(Request $request){
         if ($request->isMethod('post')) {
