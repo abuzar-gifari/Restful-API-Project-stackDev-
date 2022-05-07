@@ -32,31 +32,6 @@ class APIController extends Controller
             // return $user_data;
             $userData = $request->input();
 
-            /*
-            // CHECK THAT IF THESE FIELDS ARE EMPTY!!
-            if ( empty($request["name"]) || empty($request["email"]) || empty($request["password"]) ) {
-                return response()->json([ "status"=>false,"message"=>"please enter complete details" ],422);
-            }
-
-            // SIMPLE EMAIL VALIDATION
-            if (!filter_var($request["email"], FILTER_VALIDATE_EMAIL)) {
-                return response()->json([ 
-                    "status"=>false,
-                    "message"=>"enter valid email address" 
-                ],422);    
-            }
-
-            // CHECK THAT IS EMAIL IS EXISTS OR NOT!!
-            $userCount = User::where('email',$userData["email"])->count();
-            if ($userCount>0) {
-                return response()->json([ 
-                    "status"=>false,
-                    "message"=>"Email Already Exists!!" 
-                ],422);
-            }
-            
-            */
-
             // ADVANCE VALIDATION PROCESS   
             $rules=[
                 "name"=>"required",
@@ -165,8 +140,7 @@ class APIController extends Controller
             }else {
                 $message="Header Authorization part is incorrect";
                 return response()->json([ "status"=>false,"message"=>$message ],422);
-            }
-                
+            }                
         }
     }
 
@@ -229,7 +203,6 @@ class APIController extends Controller
                 "message"=>$e->getMessage(),
             ],422);
         }
-        
     }
 
 
@@ -313,6 +286,8 @@ class APIController extends Controller
             if ( Auth::attempt( [ "email"=>$userData['email'],"password"=>$userData['password'] ] ) ) {
                 $user = User::where('email',$userData['email'])->first();                
                 // $accessToken = $user->createToken($userData['email'])->createToken;   
+
+                // GENERATE ACCESS TOKEN FOR SPECIFIC USER..
                 $accessToken = $user->createToken($userData['email'])->accessToken;
                 // echo "<pre>";print_r(Auth::user());die; 
                 User::where('email',$userData['email'])->update(['access_token'=>$accessToken]);
@@ -327,11 +302,10 @@ class APIController extends Controller
                     "message"=>"Login Failed",
                 ],422);
             }            
-
         }                
     }
 
-    
+
     public function UpdateStock(Request $request){
         $header = $request->header('Authorization');
         if (empty($header)) {
